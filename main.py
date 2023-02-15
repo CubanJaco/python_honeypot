@@ -9,10 +9,8 @@ import configparser
 import re
 import gmail_helper
 
-
 # Setup some constants
 SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
-FILES_PATH = SCRIPT_PATH + "/files.d/"
 CONFIG_FILE = SCRIPT_PATH + "/setup.conf"
 
 # Setup some variables
@@ -33,8 +31,12 @@ def get_section_path(section, include_section=False):
 
 
 def setup_files():
+    files_folder = config['DEFAULT']['files_folder']
+    if not files_folder.endswith("/"):
+        files_folder += "/"
+
     for section in sections:
-        path_from = FILES_PATH + section
+        path_from = files_folder + section
         path_to = get_section_path(section)
 
         # Remove previous files/folders
@@ -94,7 +96,7 @@ def read_config():
         config_index = sys.argv.index('--config')+1
         config_path = sys.argv[config_index]
 
-    if os.path.isdir(config_path) or not config_path.endswith(".conf"):
+    if not (os.path.isfile(config_path) and config_path.endswith(".conf")):
         config_path = CONFIG_FILE
 
     config.read(config_path)
