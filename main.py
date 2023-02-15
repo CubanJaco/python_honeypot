@@ -88,7 +88,16 @@ def send_email(test_message=False):
 
 
 def read_config():
-    config.read(CONFIG_FILE)
+    config_path = CONFIG_FILE
+
+    if sys.argv.__contains__("--config"):
+        config_index = sys.argv.index('--config')+1
+        config_path = sys.argv[config_index]
+
+    if os.path.isdir(config_path) or not config_path.endswith(".conf"):
+        config_path = CONFIG_FILE
+
+    config.read(config_path)
     global sections
     sections = config.sections()
 
