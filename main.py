@@ -39,10 +39,9 @@ def setup_files():
         path_from = files_folder + section
         path_to = get_section_path(section)
 
-        # Remove previous files/folders
         # Create directory structure
-        # Copy files again
-        command = f'rm -rf {path_to}*; mkdir -p {path_to}{section}; cp -r {path_from} {path_to}'
+        # Copy/replace files again
+        command = f'mkdir -p {path_to}{section}; cp -rf --remove-destination {path_from} {path_to}'
         subprocess.run(command, capture_output=False, shell=True)
 
 
