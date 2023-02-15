@@ -133,6 +133,7 @@ def get_body_message(accessed_files=None):
             <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{accessed}</td>
             <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{path}</td></tr>
         """
+        styled_row = not styled_row
 
     body += "</table>"
 
