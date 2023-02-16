@@ -32,6 +32,17 @@ Default config file will look like this:
 ** Every `[section]` represent a subfolder that will be copied to the `desired_path` when you run the script with `--setup`
 
 ***
+**GMAIL AUTHENTICATION**
+
+You must follow the steeps listed in [Enable the API](https://developers.google.com/gmail/api/quickstart/python#enable_the_api) and [Authorize credentials for a desktop application](https://developers.google.com/gmail/api/quickstart/python#authorize_credentials_for_a_desktop_application) sections to get your `credentials.json` file.
+
+You should put the `credentials.json` file in `./python_honeypot/gmail_credentials.` folder.
+
+Once you have the `credentials.json` file you should give access to your _Gmail_ account using `--auth` param and use the provided _URL_ to authenticate your Google Account in a web browser.
+
+This account will be used only as a sender mail for notifications.
+
+***
 **SET UP CRON**
 
 You can set up a cron job for running the script avery some time and check if some file has been accessed.
