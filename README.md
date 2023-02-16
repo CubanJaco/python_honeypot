@@ -34,6 +34,10 @@ Default config file will look like this:
 ***
 **GMAIL AUTHENTICATION**
 
+**Gmail Requirements**
+
+    pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+
 You must follow the steeps listed in [Enable the API](https://developers.google.com/gmail/api/quickstart/python#enable_the_api) and [Authorize credentials for a desktop application](https://developers.google.com/gmail/api/quickstart/python#authorize_credentials_for_a_desktop_application) sections to get your `credentials.json` file.
 
 You should put the `credentials.json` file in `./python_honeypot/gmail_credentials.` folder.
