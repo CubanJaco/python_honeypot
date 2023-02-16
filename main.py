@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
     # Authenticate Gmail
     if sys.argv.__contains__("--auth"):
-        send_email(True)
+        send_email(test_message=True)
     else:
         run()
 
