@@ -18,6 +18,13 @@ config = configparser.ConfigParser()
 sections = []
 
 
+def get_config_parameter(name, default=None):
+    try:
+        return config['DEFAULT'][name]
+    except KeyError:
+        return default
+
+
 def get_section_path(section, include_section=False):
     path = config[section]['desired_path']
 
@@ -31,7 +38,7 @@ def get_section_path(section, include_section=False):
 
 
 def get_files_folder():
-    files_folder = config['DEFAULT']['files_folder']
+    files_folder = get_config_parameter('files_folder', SCRIPT_PATH + "/files.d")
     if not files_folder.endswith("/"):
         files_folder += "/"
 
@@ -54,6 +61,7 @@ def check_files():
     """
     This function checks every file and return true if some file has been accessed
     """
+    accessed_files = []
     for section in sections:
         # Get the original files lists
         section_folder_path = get_files_folder() + section
@@ -64,7 +72,6 @@ def check_files():
         path = get_section_path(section, True)
         output = subprocess.Popen(['find', path], stdout=subprocess.PIPE).communicate()[0].decode("utf-8").splitlines()
 
-        accessed_files = []
         for file in output:
             # Ignore any file that isnt in original files path
             if file.replace(path, "") not in section_files_path:
@@ -77,7 +84,7 @@ def check_files():
             if accessed_time:
                 accessed_files.append((file, accessed_time))
 
-        return accessed_files
+    return accessed_files
 
 
 def check_file_accessed(path):
@@ -93,8 +100,12 @@ def send_alert(accessed_files=None):
 
 
 def send_email(accessed_files=None, test_message=False):
-    sender = config['DEFAULT']['gmail_sender']
-    receiver = config['DEFAULT']['receiver_email']
+    sender = get_config_parameter('gmail_sender')
+    receiver = get_config_parameter('receiver_email')
+
+    if sender is None or receiver is None:
+        print("You should set gmail_sender and receiver_email in config file.")
+        return
 
     if test_message:
         subject = """Testing Python message"""
@@ -112,13 +123,14 @@ def get_body_message(accessed_files=None):
             Ops!!! Something went wrong, but keep alert ;)
         """
 
-    body = """
-        <h2>You have been hacked!!!</h2>
+    server_name = get_config_parameter('server_name', '')
+    body = f"""
+        <h2>Your server {server_name} has been hacked!!!</h2>
         <br>The next honeypots files has been accessed:<br><br>
         <table style="font-family: arial, sans-serif; border-collapse: collapse;">
           <tr>
-            <th style="border: 1px solid #dddddd; text-align: left; padding: 8px;" width="40%">Timestamp</th>
-            <th style="border: 1px solid #dddddd; text-align: left; padding: 8px;" width="60%">File Path</th>
+            <th style="border: 1px solid #C3C3C3; text-align: left; padding: 8px;" width="40%">Timestamp</th>
+            <th style="border: 1px solid #C3C3C3; text-align: left; padding: 8px;" width="60%">File Path</th>
           </tr>
     """
 
@@ -130,8 +142,8 @@ def get_body_message(accessed_files=None):
             body += "<tr>"
 
         body += f"""
-            <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{accessed}</td>
-            <td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">{path}</td></tr>
+            <td style="border: 1px solid #C3C3C3; text-align: left; padding: 8px;">{accessed}</td>
+            <td style="border: 1px solid #C3C3C3; text-align: left; padding: 8px;">{path}</td></tr>
         """
         styled_row = not styled_row
 
