@@ -29,6 +29,8 @@ Default config file will look like this:
 
 ** You can have multiple subfolders with multiple `[sections]` in your config file.
 
+** Every `[section]` represent a subfolder that will be copied to the `desired_path` when you run the script with `--setup`
+
 ***
 **SET UP CRON**
 
