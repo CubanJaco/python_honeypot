@@ -168,7 +168,10 @@ def read_config():
 
 
 def run():
-    accessed_files = check_files()
+    accessed_files = []
+    if not sys.argv.__contains__("--no-check"):
+        accessed_files = check_files()
+
     if len(accessed_files) != 0:
         send_alert(accessed_files)
 
