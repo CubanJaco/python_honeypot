@@ -26,6 +26,7 @@ Default config file will look like this:
     
     [sample]                                # Honeypot subfolder name
     desired_path = /home/honeypot           # Path where you want to place your honeypots in this subfolder
+    store_info = True                       # Flag used to store last accessed time or use birth date from file itself
 
 ** You can have multiple subfolders with multiple `[sections]` in your config file.
 

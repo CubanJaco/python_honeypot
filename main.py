@@ -1,13 +1,11 @@
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import os
 import sys
 import subprocess
 import configparser
 import re
 import gmail_helper
+import json_helper
 
 # Setup some constants
 SCRIPT_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -16,17 +14,18 @@ CONFIG_FILE = SCRIPT_PATH + "/setup.conf"
 # Setup some variables
 config = configparser.ConfigParser()
 sections = []
+files_data = {}
 
 
-def get_config_parameter(name, default=None):
+def get_config_parameter(name, default=None, section='DEFAULT'):
     try:
-        return config['DEFAULT'][name]
+        return config[section][name]
     except KeyError:
         return default
 
 
 def get_section_path(section, include_section=False):
-    path = config[section]['desired_path']
+    path = get_config_parameter('desired_path', '', section)
 
     if not path.endswith("/"):
         path += "/"
@@ -55,14 +54,27 @@ def setup_files():
         # Copy/replace files again
         command = f'mkdir -p {path_to}{section}; cp -rf --remove-destination {path_from} {path_to}'
         subprocess.run(command, capture_output=False, shell=True)
+    json_helper.store_files_info(files_folder + 'files_info.json', check_files(True))
 
 
-def check_files():
+def read_files_data():
+    global files_data
+    files_folder = get_files_folder()
+    files_data = json_helper.read_json(files_folder + 'files_info.json')
+
+
+def check_files(return_accessed=False):
     """
     This function checks every file and return true if some file has been accessed
     """
+    if not return_accessed:
+        read_files_data()
     accessed_files = []
     for section in sections:
+        # If is just to return accessed time, then check store_info config param or continue
+        if return_accessed and not get_config_parameter('store_info', False, section):
+            continue
+
         # Get the original files lists
         section_folder_path = get_files_folder() + section
         section_files_path = subprocess.Popen(
@@ -80,17 +92,19 @@ def check_files():
             if os.path.isdir(file):
                 continue
             # Check if file has been accessed
-            accessed_time = check_file_accessed(file)
+            accessed_time = check_file_accessed(file, return_accessed)
             if accessed_time:
                 accessed_files.append((file, accessed_time))
 
     return accessed_files
 
 
-def check_file_accessed(path):
+def check_file_accessed(path, return_access=False):
     output = subprocess.Popen(['stat', path], stdout=subprocess.PIPE).communicate()[0].decode("utf-8").splitlines()
     access = re.sub(".*: ", "", output[4])
-    birth = re.sub(".*: ", "", output[7])
+    if return_access:
+        return access
+    birth = files_data[path] if path in files_data else re.sub(".*: ", "", output[7])
     return access if access != birth else ""
 
 
