@@ -15,8 +15,11 @@ def write_json(file_path, data):
 
 def read_json(file_path):
     # Opening JSON file
-    with open(file_path, 'r') as openfile:
-        # Reading from json file
-        json_object = json.load(openfile)
+    try:
+        with open(file_path, 'r') as openfile:
+            # Reading from json file
+            json_object = json.load(openfile)
+    except FileNotFoundError:
+        return {}
     return json_object
 
